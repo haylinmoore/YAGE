@@ -1,0 +1,164 @@
+<html>
+
+    <head>
+        <link href="https://fonts.googleapis.com/css?family=Cabin+Sketch" rel="stylesheet">
+        <style>
+            html,
+            body {
+                margin: 0;
+            }
+
+            body {
+                background-color: #fff;
+                background-image: linear-gradient(90deg, transparent 79px, #abced4 79px, #abced4 81px, transparent 81px), linear-gradient(#eee .1em, transparent .1em);
+                background-size: 100% 1.2em;
+                font-family: 'Cabin Sketch', cursive;
+            }
+
+            #canvasBg,
+            #canvas {
+                background: #FFFFFF;
+                display: block;
+                position: absolute;
+                margin-left: auto;
+                margin-right: auto;
+                left: 0;
+                right: 0;
+                background: transparent;
+            }
+        </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+        <script src="./rough.min.js"></script>
+        <script>
+            GLOBAL = window;
+        </script>
+        <script src="./engine.js"></script>
+    </head>
+
+    <body>
+        <center>
+            <h1 style="font-size:50px; ">Sumo.io</h1>
+            <div style="position: relative;">
+                <canvas id="canvas" width="500" height="500" style="z-index: 1;"></canvas>
+                <canvas id="canvasBg" width="500" height="500" style="z-index: 0;"></canvas>
+            </div>
+        </center>
+        <script>
+            /* app.stage.pivot.x app.stage.pivot.y */
+
+            //PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST
+
+
+            var socket = io.connect("https://sumoio-herohamp.c9users.io:8082");
+
+            var id = uuidv4();
+
+            world.bodies.dynamic[id] = new classes.player(id, [250, 250], {}, "red")
+
+            console.log(world);
+
+            var me = id;
+
+            socket.emit("hello", id);
+
+            socket.on('welcome', function(data) {
+                world.bodies.dynamic[data.id] = new classes.player(data.id, [250, 250], {}, "blue")
+            });
+
+            var c = document.getElementById("canvas");
+            var ctx = c.getContext("2d");
+
+            var cbg = document.getElementById("canvasBg");
+            var ctxbg = cbg.getContext("2d");
+
+            var frames = {};
+
+            //var rc = rough.canvas(document.getElementById('canvas'));
+
+            var rcbg = rough.canvas(document.getElementById('canvasBg'));
+
+            //var app = new PIXI.Application(500, 500, { transparent: true });
+
+            rcbg.rectangle(10, 10, cbg.width - 10, cbg.height - 10, { roughness: 1 });
+
+            var start = null;
+
+            var stop = false;
+            var frameCount = 0;
+            var fps, fpsInterval, startTime, now, then, elapsed;
+
+            function draw() {
+
+                ctx.clearRect(0, 0, 500, 500);
+
+                for (let i in world.bodies.dynamic) {
+
+                    var body = world.bodies.dynamic[i];
+
+                    /*rc.rectangle(body.x, body.y, body.width, body.height, {
+                        roughness: 0.5,
+                            fill: body.color,
+                            fillWeight: 3
+                    });*/
+                    ctx.fillStyle = "rgb(0, 200, 0)";
+                    ctx.fillRect(body.x, body.y, body.width, body.height);
+                }
+
+                requestAnimationFrame(draw);
+
+            }
+
+
+            document.onkeydown = function(event) {
+                world.bodies.dynamic[me].key(event.keyCode, true);
+                socket.emit("move", { key: event.keyCode, state: true });
+            };
+
+            document.onkeyup = function(event) {
+                world.bodies.dynamic[me].key(event.keyCode, false);
+                socket.emit("move", { key: event.keyCode, state: false });
+            };
+
+            socket.on('move', function(data) {
+                world.bodies.dynamic[data.id].key(data.key, data.state);
+            });
+
+            socket.on('disconnected', function(id) {
+                delete world.bodies.dynamic[id];
+            })
+
+            setInterval(function() {
+                var body = world.bodies.dynamic[me];
+                socket.emit("myCord", [body.x, body.y]);
+            }, 1000 / 10)
+
+            socket.on('update', function(data) {
+
+                if (world.bodies.dynamic[data[0]] == undefined) {
+                    world.bodies.dynamic[data[0]] = new classes.player(data[0], [data[1], data[2]], {}, "red")
+                }
+                else {
+                    let player = world.bodies.dynamic[data[0]];
+                    let distance = Math.sqrt((player.x - data[1]) ^ 2 + (player.y - data[2]) ^ 2);
+
+                    console.log(distance);
+
+
+                    if (distance < 30) {
+
+                    }
+                    else {
+                        player.x = data[1];
+                        player.y = data[2];
+                        player.motion.xm = data[3];
+                        player.motion.ym = data[4];
+                    }
+
+                }
+            })
+
+            draw();
+        </script>
+    </body>
+
+</html>
