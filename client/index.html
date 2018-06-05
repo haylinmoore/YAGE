@@ -1,5 +1,4 @@
 <html>
-
     <head>
         <link href="https://fonts.googleapis.com/css?family=Cabin+Sketch" rel="stylesheet">
         <style>
@@ -44,11 +43,6 @@
             </div>
         </center>
         <script>
-            /* app.stage.pivot.x app.stage.pivot.y */
-
-            //PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST
-
-
             var socket = io.connect("https://sumoio-herohamp.c9users.io:8082");
 
             var id = uuidv4();
@@ -73,11 +67,7 @@
 
             var frames = {};
 
-            //var rc = rough.canvas(document.getElementById('canvas'));
-
             var rcbg = rough.canvas(document.getElementById('canvasBg'));
-
-            //var app = new PIXI.Application(500, 500, { transparent: true });
 
             rcbg.rectangle(10, 10, cbg.width - 10, cbg.height - 10, { roughness: 1 });
 
@@ -94,12 +84,6 @@
                 for (let i in world.bodies.dynamic) {
 
                     var body = world.bodies.dynamic[i];
-
-                    /*rc.rectangle(body.x, body.y, body.width, body.height, {
-                        roughness: 0.5,
-                            fill: body.color,
-                            fillWeight: 3
-                    });*/
                     ctx.fillStyle = "rgb(0, 200, 0)";
                     ctx.fillRect(body.x, body.y, body.width, body.height);
                 }
@@ -160,5 +144,4 @@
             draw();
         </script>
     </body>
-
 </html>

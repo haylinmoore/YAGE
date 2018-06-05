@@ -2,7 +2,7 @@
 
 //UUID system compatible with RFC4122
 function uuidv4() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0,
             v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
@@ -19,33 +19,32 @@ function colCheck(shapeA, shapeB, move) {
         hHeights = (shapeA.height / 2) + (shapeB.height / 2),
         colDir = null;
 
+    var oX, Oy;
+
     // if the x and y vector are less than the half width or half height, they we must be inside the object, causing a collision
     if (Math.abs(vX) < hWidths && Math.abs(vY) < hHeights) {
         // figures out on which side we are colliding (top, bottom, left, or right)
-        var oX = hWidths - Math.abs(vX),
-            oY = hHeights - Math.abs(vY);
+        oX = hWidths - Math.abs(vX);
+        oY = hHeights - Math.abs(vY);
         if (oX >= oY) {
             if (vY > 0) {
                 colDir = "t";
                 if (move.includes("t")) {
                     shapeA.y += oY;
                 }
-            }
-            else {
+            } else {
                 colDir = "b";
                 if (move.includes("b")) {
                     shapeA.y -= oY;
                 }
             }
-        }
-        else {
+        } else {
             if (vX > 0) {
                 colDir = "l";
                 if (move.includes("l")) {
                     shapeA.x += oX;
                 }
-            }
-            else {
+            } else {
                 colDir = "r";
                 if (move.includes("r")) {
                     shapeA.x -= oX;
@@ -63,7 +62,7 @@ function colCheck(shapeA, shapeB, move) {
 
 GLOBAL.classes = {};
 
-classes.rectangle = function(position, size, movement, settings) {
+classes.rectangle = function (position, size, movement, settings) {
 
     if (settings == undefined) {
         settings = {};
@@ -71,7 +70,7 @@ classes.rectangle = function(position, size, movement, settings) {
 
     this.settings = {
         visibility: settings.visibility | true,
-    }
+    };
 
     this.x = position[0];
 
@@ -79,7 +78,7 @@ classes.rectangle = function(position, size, movement, settings) {
 
     this.width = size[0];
 
-    this.height = size[1]
+    this.height = size[1];
 
     this.movement = movement;
 
@@ -87,13 +86,13 @@ classes.rectangle = function(position, size, movement, settings) {
         this.motion = {
             xm: 0,
             ym: 0
-        }
+        };
     }
 
     return this;
-}
+};
 
-classes.player = function(uuid, position, settings, color) {
+classes.player = function (uuid, position, settings, color) {
 
     var self = {};
 
@@ -117,7 +116,7 @@ classes.player = function(uuid, position, settings, color) {
 
     self.settings = {
         visibility: settings.visibility | true,
-    }
+    };
 
     self.x = position[0];
 
@@ -132,11 +131,11 @@ classes.player = function(uuid, position, settings, color) {
     self.motion = {
         xm: 0,
         ym: 0
-    }
+    };
 
     self.renderType = "player";
 
-    self.key = function(key, state) {
+    self.key = function (key, state) {
         switch (key) {
             case 68:
             case 39:
@@ -157,9 +156,9 @@ classes.player = function(uuid, position, settings, color) {
                 break;
 
         }
-    }
+    };
 
-    self.physics = function() {
+    self.physics = function () {
 
         if (self.pressingRight) {
             self.motion.xm += self.speed;
@@ -181,9 +180,10 @@ classes.player = function(uuid, position, settings, color) {
         self.motion.xm *= world.consts.friction;
         self.motion.ym *= world.consts.friction;
 
+        var check;
 
         for (var ii in world.bodies.static) {
-            var check = colCheck(self, world.bodies.static[ii], "tblr");
+            check = colCheck(self, world.bodies.static[ii], "tblr");
 
             if (check.hit == "b") {
                 self.grounded = true;
@@ -193,11 +193,11 @@ classes.player = function(uuid, position, settings, color) {
             }
         }
 
-        for (var ii in world.bodies.dynamic) {
+        for (ii in world.bodies.dynamic) {
             if (ii == self.uuid) {
                 continue;
             }
-            var check = colCheck(world.bodies.dynamic[ii], self, "tblr");
+            check = colCheck(world.bodies.dynamic[ii], self, "tblr");
 
             if (check.hit != null) {
                 world.bodies.dynamic[ii].motion.xm = self.motion.xm * 4;
@@ -205,10 +205,10 @@ classes.player = function(uuid, position, settings, color) {
             }
 
         }
-    }
+    };
 
     return self;
-}
+};
 
 
 /* Physics */
@@ -224,7 +224,7 @@ GLOBAL.world = {
         gravity: 1,
         friction: 0.6
     }
-}
+};
 
 //Test dynamic
 
@@ -232,13 +232,13 @@ GLOBAL.world = {
 
 // Physics Loop
 
-setInterval(function() {
+setInterval(function () {
     for (var i in world.bodies.dynamic) {
-        let body = world.bodies.dynamic[i];
+        var body = world.bodies.dynamic[i];
         body.physics();
         if (body.x < 10 || body.x > world.width - 50 || body.y < 10 || body.y > world.height - 50) {
             body.x = 250;
             body.y = 250;
         }
     }
-}, 1000 / 60)
+}, 1000 / 60);
