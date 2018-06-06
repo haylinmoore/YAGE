@@ -19,13 +19,11 @@ function colCheck(shapeA, shapeB, move) {
         hHeights = (shapeA.height / 2) + (shapeB.height / 2),
         colDir = null;
 
-    var oX, Oy;
-
     // if the x and y vector are less than the half width or half height, they we must be inside the object, causing a collision
     if (Math.abs(vX) < hWidths && Math.abs(vY) < hHeights) {
         // figures out on which side we are colliding (top, bottom, left, or right)
-        oX = hWidths - Math.abs(vX);
-        oY = hHeights - Math.abs(vY);
+        var oX = hWidths - Math.abs(vX);
+        var oY = hHeights - Math.abs(vY);
         if (oX >= oY) {
             if (vY > 0) {
                 colDir = "t";
@@ -112,7 +110,7 @@ classes.player = function (uuid, position, settings, color) {
 
     self.uuid = uuid;
 
-    self.speed = 2;
+    self.speed = 0.5;
 
     self.settings = {
         visibility: settings.visibility | true,
@@ -222,7 +220,7 @@ GLOBAL.world = {
     width: 500,
     consts: {
         gravity: 1,
-        friction: 0.6
+        friction: 0.9
     }
 };
 

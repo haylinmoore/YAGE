@@ -43,7 +43,10 @@
             </div>
         </center>
         <script>
-            var socket = io.connect("https://sumoio-herohamp.c9users.io:8082");
+
+            Array.prototype.average = function () { var sum = 0, j = 0; for (var i = 0; i < this.length, isFinite(this[i]); i++) { sum += parseFloat(this[i]); ++j; } return j ? sum / j : 0; };
+
+            var socket = io.connect("http://localhost:3000");
 
             var id = uuidv4();
 
@@ -57,7 +60,7 @@
 
             socket.on('welcome', function(data) {
                 world.bodies.dynamic[data.id] = new classes.player(data.id, [250, 250], {}, "blue")
-            });
+            
 
             var c = document.getElementById("canvas");
             var ctx = c.getContext("2d");
@@ -114,8 +117,8 @@
             setInterval(function() {
                 var body = world.bodies.dynamic[me];
                 socket.emit("myCord", [body.x, body.y]);
-            }, 1000 / 10)
-
+            }, 1000 / 20)
+            
             socket.on('update', function(data) {
 
                 if (world.bodies.dynamic[data[0]] == undefined) {
@@ -123,25 +126,26 @@
                 }
                 else {
                     let player = world.bodies.dynamic[data[0]];
-                    let distance = Math.sqrt((player.x - data[1]) ^ 2 + (player.y - data[2]) ^ 2);
+                    //let distance = Math.sqrt((player.x - data[1]) ^ 2 + (player.y - data[2]) ^ 2);
 
-                    console.log(distance);
+                    //console.log(distance);
 
 
-                    if (distance < 30) {
+                    //if (distance < 30) {
 
-                    }
-                    else {
+                    //}
+                    //else {
                         player.x = data[1];
                         player.y = data[2];
                         player.motion.xm = data[3];
                         player.motion.ym = data[4];
-                    }
+                    //}
 
                 }
             })
 
             draw();
+        });
         </script>
     </body>
 </html>

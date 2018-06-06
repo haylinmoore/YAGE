@@ -60,7 +60,7 @@ io.on('connection', function (socket) {
     });
 });
 
-http.listen(8082, function () {
+http.listen(3000, function () {
     console.log('listening on *:3000');
 });
 
@@ -72,4 +72,4 @@ setInterval(function () {
         let player = world.bodies.dynamic[id];
         io.sockets.emit('update', [id, player.x, player.y, player.motion.xm, player.motion.ym, new Date().getTime()]);
     }
-}, 1000);
+}, 1000/60);
