@@ -110,7 +110,7 @@ classes.player = function (uuid, position, settings, color) {
 
     self.uuid = uuid;
 
-    self.speed = 0.5;
+    self.speed = 0.2;
 
     self.settings = {
         visibility: settings.visibility | true,
@@ -237,6 +237,8 @@ setInterval(function () {
         if (body.x < 10 || body.x > world.width - 50 || body.y < 10 || body.y > world.height - 50) {
             body.x = 250;
             body.y = 250;
+            body.motion.xm=0;
+            body.motion.ym=0;
         }
     }
 }, 1000 / 60);
