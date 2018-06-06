@@ -178,13 +178,13 @@ exports.classes.player = function (uuid, position, settings, color) {
         self.x += self.motion.xm;
         self.y += self.motion.ym;
 
-        self.motion.xm *= world.consts.friction;
-        self.motion.ym *= world.consts.friction;
+        self.motion.xm *= exports.world.consts.friction;
+        self.motion.ym *= exports.world.consts.friction;
 
         var check;
 
-        for (var ii in world.bodies.static) {
-            check = exports.colCheck(self, world.bodies.static[ii], "tblr");
+        for (var ii in exports.world.bodies.static) {
+            check = exports.colCheck(self, exports.world.bodies.static[ii], "tblr");
 
             if (check.hit == "b") {
                 self.grounded = true;
@@ -194,15 +194,15 @@ exports.classes.player = function (uuid, position, settings, color) {
             }
         }
 
-        for (ii in world.bodies.dynamic) {
+        for (ii in exports.world.bodies.dynamic) {
             if (ii == self.uuid) {
                 continue;
             }
-            check = exports.colCheck(world.bodies.dynamic[ii], self, "tblr");
+            check = exports.colCheck(exports.world.bodies.dynamic[ii], self, "tblr");
 
             if (check.hit != null) {
-                world.bodies.dynamic[ii].motion.xm = self.motion.xm * 4;
-                world.bodies.dynamic[ii].motion.ym = self.motion.ym * 4;
+                exports.world.bodies.dynamic[ii].motion.xm = self.motion.xm * 4;
+                exports.world.bodies.dynamic[ii].motion.ym = self.motion.ym * 4;
             }
 
         }
@@ -233,10 +233,10 @@ exports.world = {
 
 exports.startWorld = function(){
     setInterval(function () {
-        for (var i in world.bodies.dynamic) {
-            var body = world.bodies.dynamic[i];
+        for (var i in exports.world.bodies.dynamic) {
+            var body = exports.world.bodies.dynamic[i];
             body.physics();
-            if (body.x < 10 || body.x > world.width - 50 || body.y < 10 || body.y > world.height - 50) {
+            if (body.x < 10 || body.x > exports.world.width - 50 || body.y < 10 || body.y > exports.world.height - 50) {
                 body.x = 250;
                 body.y = 250;
                 body.motion.xm=0;

@@ -2,7 +2,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var engine = require("../client/engine.js");
+var engine = require("./engine.js");
 var classes = engine.classes;
 var world = engine.world;
 
