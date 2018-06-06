@@ -2,8 +2,11 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var engine = require("../client/engine.js");
+var classes = engine.classes;
+var world = engine.world;
 
-require("../client/engine.js");
+engine.startWorld();
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
