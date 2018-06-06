@@ -112,7 +112,7 @@ exports.classes.player = function (uuid, position, settings, color) {
 
     self.uuid = uuid;
 
-    self.speed = 0.2;
+    self.speed = 0.5;
 
     self.settings = {
         visibility: settings.visibility | true,
