@@ -130,8 +130,8 @@
         })
 
         setInterval(function () {
-            var body = world.bodies.dynamic[me];
-            socket.emit("myCord", [body.x, body.y]);
+            //var body = world.bodies.dynamic[me];
+            //socket.emit("myCord", [body.x, body.y]);
         }, 1000 / 20)
 
         socket.on('update', function (data) {
