@@ -27,11 +27,7 @@
             background: transparent;
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
     <script src="./rough.min.js"></script>
-    <script>
-        GLOBAL = window;
-    </script>
 </head>
 
 <body>
@@ -52,22 +48,11 @@
         var classes = engine.classes;
         var world = engine.world;
 
-        var socket = io.connect("http://192.168.1.224:3000");
-
-        var id = engine.uuidv4();
-
-        world.bodies.dynamic[id] = new classes.player(id, [250, 250], {}, "red")
+        var connection = new WebSocket('ws://192.168.1.224:8080');
 
         console.log(world);
 
-        var me = id;
-
-        socket.emit("hello", id);
-
-        socket.on('welcome', function (data) {
-            world.bodies.dynamic[data.id] = new classes.player(data.id, [250, 250], {}, "blue")
-
-        });
+        var me = null;
 
         var c = document.getElementById("canvas");
         var ctx = c.getContext("2d");
@@ -105,59 +90,57 @@
         }
 
 
-        document.onkeydown = function (event) {
-            world.bodies.dynamic[me].key(event.keyCode, true);
-            socket.emit("move", {
-                key: event.keyCode,
-                state: true
-            });
-        };
+        connection.onmessage = function(e){
+            var message = JSON.parse(e.data);
 
-        document.onkeyup = function (event) {
-            world.bodies.dynamic[me].key(event.keyCode, false);
-            socket.emit("move", {
-                key: event.keyCode,
-                state: false
-            });
-        };
+            if (message[0] != 4){
+                console.log(message)
+            }
+            switch (message[0]){
+                // Goodbye. This is sent when a user disconnects
+                case 0:
+                    delete world.bodies.dynamic[message[1]];
+                    break;
+                //Hello, It welcomes the user and gives it its UUID
+                case 1:
+                    world.bodies.dynamic[message[1]] = new classes.player(message[1], [250, 250], {}, "blue");
+                    me=message[1];
+                    break;
+                // KeypressR, it says when a user switches key
+                case 3:
+                    world.bodies.dynamic[message[1]].key(message[2], message[3]);
+                    break;
+                // Update, it is sent to update client on everyones position
+                case 4:
+                    var player = world.bodies.dynamic[message[1]];
+                    //Unlikly but might happen due to async
+                    if (player == undefined){
+                        world.bodies.dynamic[message[1]] = new classes.player(message[1], [message[2], message[3]], {xm: message[4], ym: message[5]}, "blue");
+                    } else {
+                        player.x = message[2];
+                        player.y = message[3];
+                        player.motion.xm = message[4];
+                        player.motion.ym = message[5];
+                    }
 
-        socket.on('move', function (data) {
-            world.bodies.dynamic[data.id].key(data.key, data.state);
-        });
-
-        socket.on('disconnected', function (id) {
-            delete world.bodies.dynamic[id];
-        })
-
-        setInterval(function () {
-            //var body = world.bodies.dynamic[me];
-            //socket.emit("myCord", [body.x, body.y]);
-        }, 1000 / 20)
-
-        socket.on('update', function (data) {
-
-            if (world.bodies.dynamic[data[0]] == undefined) {
-                world.bodies.dynamic[data[0]] = new classes.player(data[0], [data[1], data[2]], {},
-                    "red")
-            } else {
-                let player = world.bodies.dynamic[data[0]];
-                //let distance = Math.sqrt((player.x - data[1]) ^ 2 + (player.y - data[2]) ^ 2);
-
-                //console.log(distance);
-
-
-                //if (distance < 30) {
-
-                //}
-                //else {
-                player.x = data[1];
-                player.y = data[2];
-                player.motion.xm = data[3];
-                player.motion.ym = data[4];
-                //}
 
             }
-        })
+
+        }
+
+        
+
+        document.onkeydown = function (event) {
+            // Send the users keycode to the server
+            connection.send(JSON.stringify([2, event.keyCode, true]))
+        };
+
+       
+
+        document.onkeyup = function (event) {
+            // Send the users keycode to the server
+            connection.send(JSON.stringify([2, event.keyCode, false]))
+        };
 
         draw();
     </script>

@@ -1,78 +1,90 @@
 // esversion:6
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var WebSocket = require('ws');
 var engine = require("./engine.js");
 var classes = engine.classes;
 var world = engine.world;
 
 engine.startWorld();
 
-app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/index.html');
-});
-
 var SOCKET_LIST = {};
 
-io.on('connection', function (socket) {
-    console.log('a user connected');
-    socket.id = null;
+var currentId = 0;
 
-    socket.on('hello', function (id) {
-        console.log(id);
-        socket.id = id;
-        world.bodies.dynamic[id] = new classes.player(id, [250, 250], {}, "red");
-        socket.broadcast.emit('welcome', {
-            id: id
-        });
 
-        for (var i in world.bodies.dynamic) {
-            let player = world.bodies.dynamic[id];
-            socket.emit('update', [id, player.x, player.y, player.motion.xm, player.motion.ym, new Date().getTime()]);
+const wss = new WebSocket.Server({ port: 8080 });
+
+wss.broadcast = function broadcast(data) {
+    wss.clients.forEach(function each(client) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(data);
+      }
+    });
+  };
+
+wss.on('connection', function connection(ws) {
+    ws.id = currentId;
+
+    currentId++;
+
+    SOCKET_LIST[ws.id] = ws;
+
+    world.bodies.dynamic[ws.id] = new classes.player(ws.id, [250, 250], {}, "red");
+
+    // This tells the player any data they need on join
+    // TODO: Add all data pack
+
+    ws.send(JSON.stringify([1, ws.id]));
+
+    for (var i in world.bodies.dynamic) {
+        var message = [4];
+        ws.send(JSON.stringify(message.concat(playerPack(i))));
+    }
+
+    ws.on('close', function close() {
+        console.log('disconnected');
+        delete world.bodies.dynamic[ws.id];
+        wss.broadcast(JSON.stringify([0, ws.id]));
+    });
+
+    ws.on('message', function incoming(message) {
+      message = JSON.parse(message);
+        console.log(message);
+        switch (message[0]){
+            case 2:
+                // For if a player presses a key
+
+                world.bodies.dynamic[ws.id].key(message[1], message[2]);
+
+                console.log(ws.id, message[1], message[2]);
+
+                // Echo that keypress to everyone else
+                wss.broadcast(JSON.stringify([3, ws.id, message[1], message[2]]));
+                break;
         }
 
-        SOCKET_LIST[socket.id] = socket;
     });
-    socket.on('disconnect', function (data) {
-        console.log('Disconnected');
-        socket.broadcast.emit('disconnected', socket.id);
-        delete world.bodies.dynamic[socket.id];
-        delete SOCKET_LIST[socket.id];
-    });
-    socket.on('myCord', function (data) {
-        let player = world.bodies.dynamic[socket.id];
-        console.log(player.x, data[0], player.y, data[1]);
-        let distance = Math.hypot(data[0] - player.x, data[1] - player.y);
+  });
 
-        if (distance < 100) {
-            world.bodies.dynamic[socket.id].x = data[0];
-            world.bodies.dynamic[socket.id].y = data[1];
-        } else {
-            console.log(distance);
-            io.sockets.emit('update', [socket.id, player.x, player.y, player.motion.xm, player.motion.ym, new Date().getTime()]);
-        }
+var playerPack = function(userID){
+    //[userID (Int), X-Cord (Int), Y-Cord (Int), X-Mom (Int), Y-Mom(Int)]
+    var player = world.bodies.dynamic[userID];
+    return [userID, Math.round(player.x), Math.round(player.y), roundUp(player.motion.xm, 10), roundUp(player.motion.ym, 10)];
+};
 
-    });
-    socket.on('move', function (data) {
-        world.bodies.dynamic[socket.id].key(data.key, data.state);
-        socket.broadcast.emit('move', {
-            id: socket.id,
-            key: data.key,
-            state: data.state
-        });
-    });
-});
+function roundUp(num, precision) {
+    precision = Math.pow(10, precision);
+    return Math.ceil(num * precision) / precision;
+}
 
-http.listen(3000, function () {
-    console.log('listening on *:3000');
-});
+setInterval(function(){
+
+    // Update the positions of everyone.
+
+    for (var i in world.bodies.dynamic) {
+        var message = [4];
+        wss.broadcast(JSON.stringify(message.concat(playerPack(i))));
+    }
+}, 1000/20);
 
 console.log(world);
 
-setInterval(function () {
-
-    for (let id in world.bodies.dynamic) {
-        let player = world.bodies.dynamic[id];
-        io.sockets.emit('update', [id, player.x, player.y, player.motion.xm, player.motion.ym, new Date().getTime()]);
-    }
-}, 1000/60);
