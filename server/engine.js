@@ -1,19 +1,16 @@
-const exports = module.exports = {};
+var exports = module.exports = {};
 
 /* Functions */
 
 //Homegrown square collision, with options to move out of colider
-export function colCheck(shapeA, shapeB, move) {
+exports.colCheck = function (shapeA, shapeB, move) {
     // get the vectors to check against
-    const vX = (shapeA.x + (shapeA.width / 2)) - (shapeB.x + (shapeB.width / 2));
-
-    const vY = (shapeA.y + (shapeA.height / 2)) - (shapeB.y + (shapeB.height / 2));
-
-    const // add the half widths and half heights of the objects
-    hWidths = (shapeA.width / 2) + (shapeB.width / 2);
-
-    const hHeights = (shapeA.height / 2) + (shapeB.height / 2);
-    let colDir = null;
+    var vX = (shapeA.x + (shapeA.width / 2)) - (shapeB.x + (shapeB.width / 2)),
+        vY = (shapeA.y + (shapeA.height / 2)) - (shapeB.y + (shapeB.height / 2)),
+        // add the half widths and half heights of the objects
+        hWidths = (shapeA.width / 2) + (shapeB.width / 2),
+        hHeights = (shapeA.height / 2) + (shapeB.height / 2),
+        colDir = null;
 
     // if the x and y vector are less than the half width or half height, they we must be inside the object, causing a collision
     if (Math.abs(vX) < hWidths && Math.abs(vY) < hHeights) {
@@ -50,11 +47,11 @@ export function colCheck(shapeA, shapeB, move) {
         hit: colDir,
         intercect: [oX, oY]
     };
-}
+};
 
 /* Classes */
 
-export var classes = {};
+exports.classes = {};
 
 exports.classes.rectangle = function (position, size, movement, settings) {
 
@@ -86,9 +83,9 @@ exports.classes.rectangle = function (position, size, movement, settings) {
     return this;
 };
 
-exports.classes.player = (uuid, position, settings, color) => {
+exports.classes.player = function (uuid, position, settings, color) {
 
-    const self = {};
+    var self = {};
 
     if (settings == undefined) {
         settings = {};
@@ -129,7 +126,7 @@ exports.classes.player = (uuid, position, settings, color) => {
 
     self.renderType = "player";
 
-    self.key = (key, state) => {
+    self.key = function (key, state) {
         switch (key) {
             case 68:
             case 39:
@@ -152,7 +149,7 @@ exports.classes.player = (uuid, position, settings, color) => {
         }
     };
 
-    self.physics = () => {
+    self.physics = function () {
 
         if (self.pressingRight) {
             self.motion.xm += self.speed;
@@ -174,7 +171,7 @@ exports.classes.player = (uuid, position, settings, color) => {
         self.motion.xm *= exports.world.consts.friction;
         self.motion.ym *= exports.world.consts.friction;
 
-        let check;
+        var check;
 
         for (var ii in exports.world.bodies.static) {
             check = exports.colCheck(self, exports.world.bodies.static[ii], "tblr");
@@ -207,7 +204,7 @@ exports.classes.player = (uuid, position, settings, color) => {
 
 /* Physics */
 
-export var world = {
+exports.world = {
     bodies: {
         static: [],
         dynamic: {},
@@ -224,10 +221,10 @@ export var world = {
 
 // Physics Loop
 
-export function startWorld() {
-    setInterval(() => {
-        for (const i in exports.world.bodies.dynamic) {
-            const body = exports.world.bodies.dynamic[i];
+exports.startWorld = function () {
+    setInterval(function () {
+        for (var i in exports.world.bodies.dynamic) {
+            var body = exports.world.bodies.dynamic[i];
             body.physics();
             if (body.x < 10 || body.x > exports.world.width - 50 || body.y < 10 || body.y > exports.world.height - 50) {
                 body.x = 250;
@@ -237,4 +234,4 @@ export function startWorld() {
             }
         }
     }, 1000 / 60);
-}
+};
