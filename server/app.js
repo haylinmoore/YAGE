@@ -41,21 +41,17 @@ wss.on('connection', function connection(ws) {
     }
 
     ws.on('close', function close() {
-        console.log('disconnected');
         delete world.bodies.dynamic[ws.id];
         wss.broadcast(JSON.stringify([0, ws.id]));
     });
 
     ws.on('message', function incoming(message) {
       message = JSON.parse(message);
-        console.log(message);
         switch (message[0]){
             case 2:
                 // For if a player presses a key
 
                 world.bodies.dynamic[ws.id].key(message[1], message[2]);
-
-                console.log(ws.id, message[1], message[2]);
 
                 // Echo that keypress to everyone else
                 wss.broadcast(JSON.stringify([3, ws.id, message[1], message[2]]));
@@ -86,5 +82,4 @@ setInterval(function(){
     }
 }, 1000/20);
 
-console.log(world);
 

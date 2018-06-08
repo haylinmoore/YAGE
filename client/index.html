@@ -50,8 +50,6 @@
 
         var connection = new WebSocket('ws://192.168.1.224:8080');
 
-        console.log(world);
-
         var me = null;
 
         var c = document.getElementById("canvas");
@@ -93,9 +91,6 @@
         connection.onmessage = function(e){
             var message = JSON.parse(e.data);
 
-            if (message[0] != 4){
-                console.log(message)
-            }
             switch (message[0]){
                 // Goodbye. This is sent when a user disconnects
                 case 0:
