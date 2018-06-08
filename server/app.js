@@ -11,15 +11,17 @@ var SOCKET_LIST = {};
 var currentId = 0;
 
 
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({
+    port: 8080
+});
 
 wss.broadcast = function broadcast(data) {
     wss.clients.forEach(function each(client) {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(data);
-      }
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(data);
+        }
     });
-  };
+};
 
 wss.on('connection', function connection(ws) {
     ws.id = currentId;
@@ -46,8 +48,8 @@ wss.on('connection', function connection(ws) {
     });
 
     ws.on('message', function incoming(message) {
-      message = JSON.parse(message);
-        switch (message[0]){
+        message = JSON.parse(message);
+        switch (message[0]) {
             case 2:
                 // For if a player presses a key
 
@@ -59,9 +61,9 @@ wss.on('connection', function connection(ws) {
         }
 
     });
-  });
+});
 
-var playerPack = function(userID){
+var playerPack = function (userID) {
     //[userID (Int), X-Cord (Int), Y-Cord (Int), X-Mom (Int), Y-Mom(Int)]
     var player = world.bodies.dynamic[userID];
     return [userID, Math.round(player.x), Math.round(player.y), roundUp(player.motion.xm, 10), roundUp(player.motion.ym, 10)];
@@ -72,7 +74,7 @@ function roundUp(num, precision) {
     return Math.ceil(num * precision) / precision;
 }
 
-setInterval(function(){
+setInterval(function () {
 
     // Update the positions of everyone.
 
@@ -80,6 +82,4 @@ setInterval(function(){
         var message = [4];
         wss.broadcast(JSON.stringify(message.concat(playerPack(i))));
     }
-}, 1000/20);
-
-
+}, 1000 / 20);

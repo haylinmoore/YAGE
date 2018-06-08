@@ -40,7 +40,6 @@
     </center>
     <script src="./bundle.js"></script>
     <script>
-
         var engine = require("engine");
 
         engine.startWorld();
@@ -87,30 +86,32 @@
 
         }
 
-
-        connection.onmessage = function(e){
+        connection.onmessage = function (e) {
             var message = JSON.parse(e.data);
 
-            switch (message[0]){
+            switch (message[0]) {
                 // Goodbye. This is sent when a user disconnects
                 case 0:
                     delete world.bodies.dynamic[message[1]];
                     break;
-                //Hello, It welcomes the user and gives it its UUID
+                    //Hello, It welcomes the user and gives it its UUID
                 case 1:
                     world.bodies.dynamic[message[1]] = new classes.player(message[1], [250, 250], {}, "blue");
-                    me=message[1];
+                    me = message[1];
                     break;
-                // KeypressR, it says when a user switches key
+                    // KeypressR, it says when a user switches key
                 case 3:
                     world.bodies.dynamic[message[1]].key(message[2], message[3]);
                     break;
-                // Update, it is sent to update client on everyones position
+                    // Update, it is sent to update client on everyones position
                 case 4:
                     var player = world.bodies.dynamic[message[1]];
                     //Unlikly but might happen due to async
-                    if (player == undefined){
-                        world.bodies.dynamic[message[1]] = new classes.player(message[1], [message[2], message[3]], {xm: message[4], ym: message[5]}, "blue");
+                    if (player == undefined) {
+                        world.bodies.dynamic[message[1]] = new classes.player(message[1], [message[2], message[3]], {
+                            xm: message[4],
+                            ym: message[5]
+                        }, "blue");
                     } else {
                         player.x = message[2];
                         player.y = message[3];
@@ -123,14 +124,14 @@
 
         }
 
-        
+
 
         document.onkeydown = function (event) {
             // Send the users keycode to the server
             connection.send(JSON.stringify([2, event.keyCode, true]))
         };
 
-       
+
 
         document.onkeyup = function (event) {
             // Send the users keycode to the server
