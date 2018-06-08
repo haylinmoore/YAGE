@@ -3,17 +3,8 @@ var exports = module.exports = {};
 
 /* Functions */
 
-//UUID system compatible with RFC4122
-exports.uuidv4 = function() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0,
-            v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-};
-
 //Homegrown square collision, with options to move out of colider
-exports.colCheck = function(shapeA, shapeB, move) {
+exports.colCheck = function (shapeA, shapeB, move) {
     // get the vectors to check against
     var vX = (shapeA.x + (shapeA.width / 2)) - (shapeB.x + (shapeB.width / 2)),
         vY = (shapeA.y + (shapeA.height / 2)) - (shapeB.y + (shapeB.height / 2)),
@@ -231,7 +222,7 @@ exports.world = {
 
 // Physics Loop
 
-exports.startWorld = function(){
+exports.startWorld = function () {
     setInterval(function () {
         for (var i in exports.world.bodies.dynamic) {
             var body = exports.world.bodies.dynamic[i];
@@ -239,12 +230,10 @@ exports.startWorld = function(){
             if (body.x < 10 || body.x > exports.world.width - 50 || body.y < 10 || body.y > exports.world.height - 50) {
                 body.x = 250;
                 body.y = 250;
-                body.motion.xm=0;
-                body.motion.ym=0;
+                body.motion.xm = 0;
+                body.motion.ym = 0;
             }
         }
     }, 1000 / 60);
 };
-
-
 },{}]},{},[]);
