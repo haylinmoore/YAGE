@@ -1,14 +1,16 @@
 // esversion:6
-var WebSocket = require('ws');
-var engine = require("./engine.js");
-var classes = engine.classes;
-var world = engine.world;
+// esversion:6
+import WebSocket from 'ws';
+
+import engine from "./engine.js";
+const classes = engine.classes;
+const world = engine.world;
 
 engine.startWorld();
 
-var SOCKET_LIST = {};
+const SOCKET_LIST = {};
 
-var currentId = 0;
+let currentId = 0;
 
 
 const wss = new WebSocket.Server({
@@ -37,8 +39,8 @@ wss.on('connection', function connection(ws) {
 
     ws.send(JSON.stringify([1, ws.id]));
 
-    for (var i in world.bodies.dynamic) {
-        var message = [4];
+    for (const i in world.bodies.dynamic) {
+        const message = [4];
         ws.send(JSON.stringify(message.concat(playerPack(i))));
     }
 
@@ -63,9 +65,9 @@ wss.on('connection', function connection(ws) {
     });
 });
 
-var playerPack = function (userID) {
+var playerPack = userID => {
     //[userID (Int), X-Cord (Int), Y-Cord (Int), X-Mom (Int), Y-Mom(Int)]
-    var player = world.bodies.dynamic[userID];
+    const player = world.bodies.dynamic[userID];
     return [userID, Math.round(player.x), Math.round(player.y), roundUp(player.motion.xm, 10), roundUp(player.motion.ym, 10)];
 };
 
@@ -74,12 +76,12 @@ function roundUp(num, precision) {
     return Math.ceil(num * precision) / precision;
 }
 
-setInterval(function () {
+setInterval(() => {
 
     // Update the positions of everyone.
 
-    for (var i in world.bodies.dynamic) {
-        var message = [4];
+    for (const i in world.bodies.dynamic) {
+        const message = [4];
         wss.broadcast(JSON.stringify(message.concat(playerPack(i))));
     }
 }, 1000 / 20);
