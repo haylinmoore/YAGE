@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -28,14 +29,15 @@
         }
     </style>
     <script src="./rough.min.js"></script>
+    <title></title>
 </head>
 
 <body>
     <center>
-        <h1 style="font-size:50px; ">Sumo.io</h1>
+        <h1 style="font-size:50px;">Sumo.io</h1>
         <div style="position: relative;">
-            <canvas id="canvas" width="500" height="500" style="z-index: 1;"></canvas>
-            <canvas id="canvasBg" width="500" height="500" style="z-index: 0;"></canvas>
+            <canvas height="500" id="canvas" style="z-index: 1;" width="500"></canvas>
+            <canvas height="500" id="canvasBg" style="z-index: 0;" width="500"></canvas>
         </div>
     </center>
     <script src="./bundle.js"></script>
@@ -56,8 +58,6 @@
 
         var cbg = document.getElementById("canvasBg");
         var ctxbg = cbg.getContext("2d");
-
-        var frames = {};
 
         var rcbg = rough.canvas(document.getElementById('canvasBg'));
 
