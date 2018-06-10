@@ -2,44 +2,25 @@
 <html>
 
 <head>
-    <link href="https://fonts.googleapis.com/css?family=Cabin+Sketch" rel="stylesheet">
     <style>
         html,
         body {
             margin: 0;
         }
 
-        body {
-            background-color: #fff;
-            background-image: linear-gradient(90deg, transparent 79px, #abced4 79px, #abced4 81px, transparent 81px), linear-gradient(#eee .1em, transparent .1em);
-            background-size: 100% 1.2em;
-            font-family: 'Cabin Sketch', cursive;
-        }
-
-        #canvasBg,
         #canvas {
             background: #FFFFFF;
             display: block;
             position: absolute;
-            margin-left: auto;
-            margin-right: auto;
-            left: 0;
-            right: 0;
             background: transparent;
+
         }
     </style>
-    <script src="./rough.min.js"></script>
-    <title></title>
+    <title>Engine</title>
 </head>
 
 <body>
-    <center>
-        <h1 style="font-size:50px;">Sumo.io</h1>
-        <div style="position: relative;">
-            <canvas height="500" id="canvas" style="z-index: 1;" width="500"></canvas>
-            <canvas height="500" id="canvasBg" style="z-index: 0;" width="500"></canvas>
-        </div>
-    </center>
+    <canvas id="canvas" style="z-index: 1;" width="500"></canvas>
     <script src="./bundle.js"></script>
     <script>
         var engine = require("engine");
@@ -56,18 +37,15 @@
         var c = document.getElementById("canvas");
         var ctx = c.getContext("2d");
 
-        var cbg = document.getElementById("canvasBg");
-        var ctxbg = cbg.getContext("2d");
-
-        var rcbg = rough.canvas(document.getElementById('canvasBg'));
-
-        rcbg.rectangle(10, 10, cbg.width - 10, cbg.height - 10, {
-            roughness: 1
-        });
+        function resizeCanvas() {
+            canvas.width = window.innerWidth - 20;
+            canvas.height = window.innerHeight - 20;
+        }
+        resizeCanvas();
 
         function draw() {
 
-            ctx.clearRect(0, 0, 500, 500);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             for (let i in world.bodies.dynamic) {
 

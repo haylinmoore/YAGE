@@ -227,12 +227,6 @@ exports.startWorld = function () {
         for (var i in exports.world.bodies.dynamic) {
             var body = exports.world.bodies.dynamic[i];
             body.physics();
-            if (body.x < 10 || body.x > exports.world.width - 50 || body.y < 10 || body.y > exports.world.height - 50) {
-                body.x = 250;
-                body.y = 250;
-                body.motion.xm = 0;
-                body.motion.ym = 0;
-            }
         }
     }, 1000 / 60);
 };
