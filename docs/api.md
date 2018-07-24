@@ -22,4 +22,4 @@ Update. Update is sent to update the position of the player to other players. Fo
 
 ### Code 5
 
-Reserved for myCord. Unused
+Reserved for myCord. Proposed But Not Used Yet

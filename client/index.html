@@ -30,7 +30,11 @@
         var classes = engine.classes;
         var world = engine.world;
 
-        var connection = new WebSocket('ws://192.168.1.224:8080');
+        var map = [
+            [200, 200, 20, 20]
+        ]
+
+        var connection = new WebSocket('ws://0.0.0.0:8082');
 
         var me = null;
 
@@ -47,12 +51,42 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            var mecords = undefined;
+
             for (let i in world.bodies.dynamic) {
 
-                var body = world.bodies.dynamic[i];
-                ctx.fillStyle = "rgb(0, 200, 0)";
-                ctx.fillRect(body.x, body.y, body.width, body.height);
+                if (i == me) {
+                    mecords = world.bodies.dynamic[i];
+                }
             }
+
+            if (mecords) {
+                for (let i in world.bodies.dynamic) {
+
+                    var offsets = [(0 - mecords.x + (canvas.width / 2) - (mecords.width/2)), (0 - mecords.y + (canvas.height / 2) - (mecords.height/2))]
+
+                    if (i != me) {
+                        var body = world.bodies.dynamic[i];
+                        ctx.fillStyle = "rgb(0, 200, 0)";
+
+                        console.log(body.x - mecords.x + (canvas.width / 2))
+
+                        ctx.fillRect(body.x + offsets[0] , body.y + offsets[1],
+                            body.width, body.height);
+                    }
+                }
+
+                ctx.fillStyle = "rgb(200, 0, 0)";
+                ctx.fillRect((canvas.width / 2) - mecords.width / 2, (canvas.height / 2) - mecords.height / 2, mecords.width,
+                    mecords.height);
+
+                for (let i in map) {
+                    console.log(map[i])
+                    ctx.fillRect(map[i][0] - mecords.x + (canvas.width / 2), map[i][1] - mecords.y + (canvas.height / 2),
+                        map[i][2], map[i][3]);
+                }
+            }
+
 
             requestAnimationFrame(draw);
 
@@ -100,14 +134,14 @@
 
         document.onkeydown = function (event) {
             // Send the users keycode to the server
-            connection.send(JSON.stringify([2, event.keyCode, true]))
+            connection.send(JSON.stringify([2, event.keyCode, true]));
         };
 
 
 
         document.onkeyup = function (event) {
             // Send the users keycode to the server
-            connection.send(JSON.stringify([2, event.keyCode, false]))
+            connection.send(JSON.stringify([2, event.keyCode, false]));
         };
 
         draw();

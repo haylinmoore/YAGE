@@ -12,7 +12,7 @@ var currentId = 0;
 
 
 const wss = new WebSocket.Server({
-    port: 8080
+    port: 8082
 });
 
 wss.broadcast = function broadcast(data) {
@@ -82,4 +82,4 @@ setInterval(function () {
         var message = [4];
         wss.broadcast(JSON.stringify(message.concat(playerPack(i))));
     }
-}, 1000 / 20);
+}, 1000/5);
