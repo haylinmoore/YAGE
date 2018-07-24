@@ -5,7 +5,7 @@
 
 ## Purpose?
 
-I have always liked the idea of making an iO so I decided I would start giving it a shot.
+I have always liked the idea of making an iO game so I decided I would start giving it a shot. This is the game engine that will run whatever game I decide to make.
 
 ## The Plans?
 
